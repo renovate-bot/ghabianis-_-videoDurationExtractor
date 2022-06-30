@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+            integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <title>Video Duration Extractor</title>
+        <style>
+            #input-upload-file {
+                margin-left: 30%;
+                margin-top: 10%;
+            }
+
+            #input-upload-file button {
+                margin-left: 3%;
+                margin-bottom: 1%;
+            }
+        </style>
+    </head>
+
+    <body>
+        <span style="margin-left: 40%; font-size:30px">upload! (ღ˘⌣˘ღ)</span>
+        <div id="input-upload-file" class="box-shadow" style="display: block;">
+            <input type="file" class="form-control w-50 mt-0" id="fileUp" name="fileUpload" style="display: inline">
+            <button class="btn btn-outline-warning ml-3" onclick="emptyTable()" style="display: inline"><i
+                    class="fa fa-trash" aria-hidden="true"></i></button>
+        </div>
+        <pre id="infos"></pre>
+        <!-- <h6 id="name"></h6> -->
+        <script>
+            var myVideos = [];
+            var myvdLinks = { link: '' }
+            window.URL = window.URL || window.webkitURL;
+            document.getElementById('fileUp').onchange = setFileInfo;
+            function setFileInfo() {
+                var files = this.files;
+                console.log(files[0].name);
+                myvdLinks.link = files[0].name;
+                myVideos.push(files[0]);
+                var nm = document.getElementById('name');
+                // nm.style.marginLeft ='40%'
+                // nm.style.marginTop ='2%'
+                // nm.innerHTML = 'name: '+myvdLinks.link;
+                var video = document.createElement('video');
+                video.preload = 'metadata';
+                video.onloadedmetadata = function () {
+                    window.URL.revokeObjectURL(video.src);
+                    var duration = video.duration;
+                    var min = parseInt(video.duration / 60, 10);
+                    const sec = parseInt(duration, 10); // convert value to number if it's string
+                    let hours = Math.floor(sec / 3600); // get hours
+                    let minutes = Math.floor((sec - (hours * 3600)) / 60); // get minutes
+                    let seconds = sec - (hours * 3600) - (minutes * 60); //  get seconds
+                    var ch = (hours + 'H:' + minutes + 'M:' + seconds + 'S');
+                    str = ch.split(':');
+                    hourss = str[0];
+                    minutess = str[1];
+                    secondss = str[2];
+                    if (hourss != '0H' && secondss != '0S' && minutess) {
+                        myVideos[myVideos.length - 1].duration = '===>' + hourss + ':' + minutess + ':' + secondss + '\n';
+                    } else if (hours == '0H' || minutess != '0M' || secondss == '0S') {
+                        myVideos[myVideos.length - 1].duration = '===>' + minutess + ':' + secondss + '\n';
+                    }
+                    else if (minutess == '0M' && hourss == '0H') {
+                        myVideos[myVideos.length - 1].duration = '===>' + secondss + '\n';
+                    }
+                    updateInfos();
+                }
+                video.src = URL.createObjectURL(files[0]);;
+            }
+            function updateInfos() {
+                var infos = document.getElementById('infos');
+                infos.style.marginLeft = '40%'
+                infos.style.marginTop = '2%'
+                infos.textContent = "";
+                for (var i = 0; i < myVideos.length; i++) {
+                    infos.textContent += myVideos[i].duration;
+                }
+            }
+            function emptyTable() {
+                infos.textContent = "";
+                for (var i = 0; i < myVideos.length; i++) {
+                    if (myVideos) {
+                        myVideos[i].duration = '';
+                    }
+                }
+            }
+        </script>
+    </body>
+
+</html>
